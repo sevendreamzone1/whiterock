@@ -63,14 +63,24 @@ function createMySqlPool(): mysql.Pool {
   });
 }
 
-function getPostgresConnectionString(): string | undefined {
-  return (
-    process.env.DATABASE_URL ||
-    process.env.POSTGRES_URL ||
-    process.env.DATABASE_URL_UNPOOLED ||
-    process.env.POSTGRES_URL_NON_POOLING ||
-    process.env.POSTGRES_PRISMA_URL
-  );
+// function getPostgresConnectionString(): string | undefined {
+//   return (
+//     process.env.DATABASE_URL ||
+//     process.env.POSTGRES_URL ||
+//     process.env.DATABASE_URL_UNPOOLED ||
+//     process.env.POSTGRES_URL_NON_POOLING ||
+//     process.env.POSTGRES_PRISMA_URL
+//   );
+// }
+
+function getPostgresConnectionString(): string {
+  const url = process.env.DATABASE_URL;
+
+  if (!url) {
+    throw new Error("DATABASE_URL is not set");
+  }
+
+  return url;
 }
 
 function getPostgresSslConfig(): false | { rejectUnauthorized: boolean } {
