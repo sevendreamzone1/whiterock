@@ -79,6 +79,8 @@ DATABASE_URL=postgresql://user:password@host/database?sslmode=require
 JWT_SECRET=your-production-secret
 ```
 
+The Neon integration can also provide `POSTGRES_URL`, `PGHOST`, `PGUSER`, `PGDATABASE`, and `PGPASSWORD`; the app supports those too.
+
 Run the Neon/PostgreSQL schema once with `DATABASE_URL` set:
 
 ```bash
@@ -95,6 +97,7 @@ npm run db:schema:postgres
 ## Routes
 
 - `GET /` - API status
+- `GET /api/health` - API and database status
 - `POST /api/register` - register a user with JSON body `{ "firstName": "Asha", "email": "asha@example.com", "password": "secret123" }`
 - `POST /api/login` - login with JSON body `{ "email": "asha@example.com", "password": "secret123" }`
 - `GET /api/users` - list users, requires Bearer token

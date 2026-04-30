@@ -24,6 +24,18 @@ function normalizeDatabaseClient(value: string | undefined): DatabaseClient | un
   throw new Error(`Unsupported DB_CLIENT value: ${value}`);
 }
 
+function hasPostgresConfig(): boolean {
+  return Boolean(
+    process.env.DATABASE_URL ||
+      process.env.DATABASE_URL_UNPOOLED ||
+      process.env.POSTGRES_URL ||
+      process.env.POSTGRES_URL_NON_POOLING ||
+      process.env.POSTGRES_PRISMA_URL ||
+      process.env.PGHOST ||
+      process.env.POSTGRES_HOST,
+  );
+}
+
 function resolveDatabaseClient(): DatabaseClient {
   const configuredClient = normalizeDatabaseClient(process.env.DB_CLIENT);
 
@@ -31,7 +43,7 @@ function resolveDatabaseClient(): DatabaseClient {
     return configuredClient;
   }
 
-  return process.env.VERCEL === '1' || process.env.DATABASE_URL
+  return process.env.VERCEL === '1' || hasPostgresConfig()
     ? 'postgres'
     : 'mysql';
 }
@@ -52,18 +64,29 @@ function createMySqlPool(): mysql.Pool {
 }
 
 function getPostgresConnectionString(): string | undefined {
-  return process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  return (
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.DATABASE_URL_UNPOOLED ||
+    process.env.POSTGRES_URL_NON_POOLING ||
+    process.env.POSTGRES_PRISMA_URL
+  );
 }
 
 function getPostgresSslConfig(): false | { rejectUnauthorized: boolean } {
-  if (process.env.PG_SSL === 'false') {
+  const sslMode = process.env.PGSSLMODE?.toLowerCase();
+
+  if (process.env.PG_SSL === 'false' || sslMode === 'disable') {
     return false;
   }
 
   if (
     process.env.PG_SSL === 'true' ||
+    ['require', 'verify-ca', 'verify-full', 'no-verify'].includes(
+      sslMode || '',
+    ) ||
     process.env.VERCEL === '1' ||
-    getPostgresConnectionString()
+    hasPostgresConfig()
   ) {
     return { rejectUnauthorized: false };
   }
@@ -93,11 +116,27 @@ function createPostgresPool(): Pool {
 
   return new Pool({
     ...baseConfig,
-    host: process.env.PG_HOST || '127.0.0.1',
-    port: Number(process.env.PG_PORT || 5432),
-    user: process.env.PG_USER || 'postgres',
-    password: process.env.PG_PASSWORD || '',
-    database: process.env.PG_DATABASE || 'development',
+    host:
+      process.env.PGHOST ||
+      process.env.PG_HOST ||
+      process.env.POSTGRES_HOST ||
+      '127.0.0.1',
+    port: Number(process.env.PGPORT || process.env.PG_PORT || 5432),
+    user:
+      process.env.PGUSER ||
+      process.env.PG_USER ||
+      process.env.POSTGRES_USER ||
+      'postgres',
+    password:
+      process.env.PGPASSWORD ||
+      process.env.PG_PASSWORD ||
+      process.env.POSTGRES_PASSWORD ||
+      '',
+    database:
+      process.env.PGDATABASE ||
+      process.env.PG_DATABASE ||
+      process.env.POSTGRES_DATABASE ||
+      'development',
   });
 }
 
