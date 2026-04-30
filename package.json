@@ -4,10 +4,15 @@
   "description": "Express API connected to MySQL locally and PostgreSQL on Vercel.",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc",
+    "build": "npm run build:api && npm run build:client",
+    "build:api": "tsc",
+    "build:client": "vite build --config client/vite.config.ts",
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
-    "typecheck": "tsc --noEmit",
+    "dev:client": "vite --config client/vite.config.ts --host 127.0.0.1",
+    "typecheck": "npm run typecheck:api && npm run typecheck:client",
+    "typecheck:api": "tsc --noEmit",
+    "typecheck:client": "tsc --project client/tsconfig.json --noEmit",
     "db:setup": "tsx src/scripts/setup-db.ts",
     "db:schema": "tsx src/scripts/run-schema.ts",
     "db:schema:mysql": "tsx src/scripts/run-schema.ts",
@@ -23,14 +28,20 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.22.3",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.6.0",
     "@types/pg": "^8.20.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
     "tsx": "^4.21.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vite": "^8.0.10"
   }
 }

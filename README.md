@@ -1,6 +1,6 @@
 # Registration API
 
-Small TypeScript Express project with a users table, registration, and bearer-token login. It uses MySQL locally by default and PostgreSQL/Neon on Vercel.
+Small TypeScript Express and React project with a users table, registration, and bearer-token login. It uses MySQL locally by default and PostgreSQL/Neon on Vercel.
 
 ## Project Structure
 
@@ -14,6 +14,9 @@ src/
   middlewares/     Error handling
   app.ts           Express app setup
   server.ts        Entry point
+client/
+  src/             React TypeScript login/register UI
+  vite.config.ts   Frontend dev server and build config
 ```
 
 ## Setup
@@ -50,7 +53,14 @@ npm run db:check
 npm run dev
 ```
 
-The server runs at `http://localhost:3000` by default.
+7. In another terminal, start the React frontend:
+
+```bash
+npm run dev:client
+```
+
+The API runs at `http://localhost:3000` and the React app runs at `http://127.0.0.1:5173`.
+In local React dev, `/api` requests are proxied to the local API. To point the UI at the deployed API instead, set `VITE_API_BASE_URL` in `client/.env`.
 
 ## Database Selection
 
@@ -90,8 +100,9 @@ npm run db:schema:postgres
 ## TypeScript
 
 - `npm run dev` runs the TypeScript source directly with `tsx`.
+- `npm run dev:client` runs the React app with Vite.
 - `npm run typecheck` checks types without emitting files.
-- `npm run build` compiles TypeScript to `dist/`.
+- `npm run build` compiles the API and builds the React app to `dist/client`.
 - `npm start` runs the compiled `dist/server.js`; run `npm run build` first.
 
 ## Routes
