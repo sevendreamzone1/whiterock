@@ -1,6 +1,6 @@
 import express, { type Request, type Response } from 'express';
 
-import { databaseClient, testConnection } from './config/db';
+import { databaseClient, listTables, testConnection } from './config/db';
 import errorHandler from './middlewares/error.middleware';
 import userRoutes from './routes/user.routes';
 
@@ -29,6 +29,36 @@ app.get('/api/health', async (_req: Request, res: Response) => {
       database: {
         client: databaseClient,
         connected: false,
+      },
+    });
+  }
+});
+
+app.get('/api/health/tables', async (_req: Request, res: Response) => {
+  try {
+    const tables = await listTables();
+
+    res.json({
+      status: 'ok',
+      database: {
+        client: databaseClient,
+        connected: true,
+      },
+      tables,
+      checks: {
+        usersTablePresent: tables.includes('users'),
+      },
+    });
+  } catch (_err) {
+    res.status(503).json({
+      status: 'error',
+      database: {
+        client: databaseClient,
+        connected: false,
+      },
+      tables: [],
+      checks: {
+        usersTablePresent: false,
       },
     });
   }

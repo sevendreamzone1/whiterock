@@ -98,6 +98,7 @@ npm run db:schema:postgres
 
 - `GET /` - API status
 - `GET /api/health` - API and database status
+- `GET /api/health/tables` - active database table list and `users` table check
 - `POST /api/register` - register a user with JSON body `{ "firstName": "Asha", "email": "asha@example.com", "password": "secret123" }`
 - `POST /api/login` - login with JSON body `{ "email": "asha@example.com", "password": "secret123" }`
 - `GET /api/users` - list users, requires Bearer token

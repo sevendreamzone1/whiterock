@@ -1,10 +1,17 @@
 import './env';
 
-import mysql, { type QueryResult as MySqlQueryResult } from 'mysql2/promise';
+import mysql, {
+  type QueryResult as MySqlQueryResult,
+  type RowDataPacket,
+} from 'mysql2/promise';
 import { Pool, type QueryResultRow } from 'pg';
 
 type QueryParam = string | number | boolean | Date | null;
 type DatabaseClient = 'mysql' | 'postgres';
+type TableRow = { table_name: string };
+type PostgresTableRow = TableRow & QueryResultRow;
+
+interface MySqlTableRow extends TableRow, RowDataPacket {}
 
 function normalizeDatabaseClient(value: string | undefined): DatabaseClient | undefined {
   const normalized = value?.trim().toLowerCase();
@@ -199,6 +206,30 @@ async function testConnection(): Promise<void> {
   }
 }
 
+async function listTables(): Promise<string[]> {
+  if (databaseClient === 'postgres') {
+    const rows = await queryPostgres<PostgresTableRow>(`
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
+        AND table_type = 'BASE TABLE'
+      ORDER BY table_name
+    `);
+
+    return rows.map((row) => row.table_name);
+  }
+
+  const rows = await queryMySql<MySqlTableRow[]>(`
+    SELECT TABLE_NAME AS table_name
+    FROM information_schema.TABLES
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_TYPE = 'BASE TABLE'
+    ORDER BY TABLE_NAME
+  `);
+
+  return rows.map((row) => row.table_name);
+}
+
 async function closeConnection(): Promise<void> {
   if (postgresPool) {
     await postgresPool.end();
@@ -215,6 +246,7 @@ export {
   createPostgresPool,
   databaseClient,
   executePostgres,
+  listTables,
   queryMySql,
   queryPostgres,
   testConnection,
