@@ -1,7 +1,7 @@
 {
   "name": "express-mysql-api",
   "version": "1.0.0",
-  "description": "Express API connected to MySQL.",
+  "description": "Express API connected to MySQL locally and PostgreSQL on Vercel.",
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
@@ -10,6 +10,8 @@
     "typecheck": "tsc --noEmit",
     "db:setup": "tsx src/scripts/setup-db.ts",
     "db:schema": "tsx src/scripts/run-schema.ts",
+    "db:schema:mysql": "tsx src/scripts/run-schema.ts",
+    "db:schema:postgres": "tsx src/scripts/run-postgres-schema.ts",
     "db:check": "tsx src/scripts/check-db.ts"
   },
   "keywords": [],
@@ -20,12 +22,14 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "mysql2": "^3.22.3"
+    "mysql2": "^3.22.3",
+    "pg": "^8.20.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.6.0",
+    "@types/pg": "^8.20.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3"
   }

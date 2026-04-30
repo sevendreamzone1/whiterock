@@ -47,6 +47,15 @@ function createError(message: string, statusCode: number): HttpError {
   return error;
 }
 
+function isDuplicateEmailError(err: unknown): boolean {
+  if (!(err instanceof Error)) {
+    return false;
+  }
+
+  const code = (err as DatabaseError).code;
+  return code === 'ER_DUP_ENTRY' || code === '23505';
+}
+
 function getPayloadValue(body: unknown, key: keyof UserPayload): string | undefined {
   if (!body || typeof body !== 'object') {
     return undefined;
@@ -133,7 +142,7 @@ async function createUser(body: unknown): Promise<PublicUser> {
   try {
     userId = await userModel.create({ firstName, email, passwordHash });
   } catch (err) {
-    if (err instanceof Error && (err as DatabaseError).code === 'ER_DUP_ENTRY') {
+    if (isDuplicateEmailError(err)) {
       throw createError('Email is already registered', 409);
     }
 

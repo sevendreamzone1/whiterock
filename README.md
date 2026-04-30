@@ -1,6 +1,6 @@
 # Registration API
 
-Small TypeScript Express project with a users table, registration, and bearer-token login.
+Small TypeScript Express project with a users table, registration, and bearer-token login. It uses MySQL locally by default and PostgreSQL/Neon on Vercel.
 
 ## Project Structure
 
@@ -30,9 +30,9 @@ npm install
 copy .env.example .env
 ```
 
-3. Update `.env` with your MySQL username, password, host, database name, and JWT secret.
+3. Update `.env` with your local MySQL username, password, host, database name, and JWT secret.
 
-4. Create the database and users table:
+4. Create the local MySQL database and users table:
 
 ```bash
 npm run db:schema
@@ -51,6 +51,39 @@ npm run dev
 ```
 
 The server runs at `http://localhost:3000` by default.
+
+## Database Selection
+
+The active database is selected from environment variables:
+
+- Local default: MySQL
+- Vercel default: PostgreSQL, because Vercel sets `VERCEL=1`
+- Manual override: set `DB_CLIENT=mysql` or `DB_CLIENT=postgres`
+
+For local MySQL, use:
+
+```env
+DB_CLIENT=mysql
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+MYSQL_USER=root
+MYSQL_PASSWORD=
+MYSQL_DATABASE=development
+```
+
+For Vercel with Neon, add these environment variables in the Vercel project settings:
+
+```env
+DB_CLIENT=postgres
+DATABASE_URL=postgresql://user:password@host/database?sslmode=require
+JWT_SECRET=your-production-secret
+```
+
+Run the Neon/PostgreSQL schema once with `DATABASE_URL` set:
+
+```bash
+npm run db:schema:postgres
+```
 
 ## TypeScript
 
