@@ -1,5 +1,6 @@
 import express, { type Request, type Response } from 'express';
 
+import { getAuthConfigStatus } from './config/auth';
 import { databaseClient, listTables, testConnection } from './config/db';
 import errorHandler from './middlewares/error.middleware';
 import userRoutes from './routes/user.routes';
@@ -22,6 +23,7 @@ app.get('/api/health', async (_req: Request, res: Response) => {
         client: databaseClient,
         connected: true,
       },
+      auth: getAuthConfigStatus(),
     });
   } catch (_err) {
     res.status(503).json({
@@ -30,6 +32,7 @@ app.get('/api/health', async (_req: Request, res: Response) => {
         client: databaseClient,
         connected: false,
       },
+      auth: getAuthConfigStatus(),
     });
   }
 });
@@ -44,6 +47,7 @@ app.get('/api/health/tables', async (_req: Request, res: Response) => {
         client: databaseClient,
         connected: true,
       },
+      auth: getAuthConfigStatus(),
       tables,
       checks: {
         usersTablePresent: tables.includes('users'),
@@ -56,6 +60,7 @@ app.get('/api/health/tables', async (_req: Request, res: Response) => {
         client: databaseClient,
         connected: false,
       },
+      auth: getAuthConfigStatus(),
       tables: [],
       checks: {
         usersTablePresent: false,

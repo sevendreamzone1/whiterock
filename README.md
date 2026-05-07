@@ -91,13 +91,20 @@ DATABASE_URL=postgresql://user:password@host/database?sslmode=require
 JWT_SECRET=your-production-secret
 ```
 
-The Neon integration can also provide `POSTGRES_URL`, `PGHOST`, `PGUSER`, `PGDATABASE`, and `PGPASSWORD`; the app supports those too.
+The Neon integration can also provide `DATABASE_URL_UNPOOLED`, `POSTGRES_URL`, `PGHOST`, `PGUSER`, `PGDATABASE`, and `PGPASSWORD`; the app supports those too. `JWT_SECRET` is required for login tokens. The app also accepts `AUTH_SECRET` or `NEXTAUTH_SECRET` if you already use one of those names in Vercel.
+
+After changing Vercel environment variables, redeploy the project. Existing deployments do not receive new environment variable values.
 
 Run the Neon/PostgreSQL schema once with `DATABASE_URL` set:
 
 ```bash
 npm run db:schema:postgres
 ```
+
+You can verify deployment configuration with:
+
+- `GET /api/health` - checks database connectivity and whether JWT auth is configured
+- `GET /api/health/tables` - checks the database tables and confirms the `users` table exists
 
 ## TypeScript
 

@@ -1,6 +1,8 @@
 import type { NextFunction, Request, Response } from 'express';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 
+import { requireJwtSecret } from '../config/auth';
+
 function isJwtPayload(payload: string | JwtPayload): payload is JwtPayload {
   return typeof payload === 'object' && payload !== null;
 }
@@ -10,10 +12,12 @@ function authenticateBearerToken(
   res: Response,
   next: NextFunction,
 ): void {
-  const jwtSecret = process.env.JWT_SECRET;
+  let jwtSecret: string;
 
-  if (!jwtSecret) {
-    res.status(500).json({ error: 'JWT secret is not configured' });
+  try {
+    jwtSecret = requireJwtSecret();
+  } catch (err) {
+    next(err);
     return;
   }
 

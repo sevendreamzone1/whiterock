@@ -22,6 +22,10 @@ export interface HealthResponse {
     client: string;
     connected: boolean;
   };
+  auth?: {
+    jwtConfigured: boolean;
+    secretSource?: string;
+  };
 }
 
 export interface AuthPayload {

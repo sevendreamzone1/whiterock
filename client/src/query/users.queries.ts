@@ -38,8 +38,7 @@ function useUsersEvents(token?: string): void {
       try {
         const response = await openUserEventsStream(activeToken, controller.signal);
 
-        if (response.status === 401) {
-          window.dispatchEvent(new CustomEvent('api:unauthorized'));
+        if (response.status === 401 || response.status === 403) {
           return;
         }
 
@@ -97,5 +96,6 @@ export function useUsersQuery(token?: string) {
     queryKey: queryKeys.users(token),
     queryFn: () => listUsers(token || ''),
     enabled: Boolean(token),
+    refetchInterval: token ? 5000 : false,
   });
 }

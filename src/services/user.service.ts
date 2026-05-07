@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt, { type SignOptions } from 'jsonwebtoken';
 
+import { requireJwtSecret } from '../config/auth';
 import * as userModel from '../models/user.model';
 import type { AuthUser, PublicUser } from '../models/user.model';
 
@@ -141,11 +142,7 @@ function parseUserId(id: unknown): number {
 }
 
 function createAccessToken(user: AuthUser): string {
-  const jwtSecret = process.env.JWT_SECRET;
-
-  if (!jwtSecret) {
-    throw createError('JWT secret is not configured', 500);
-  }
+  const jwtSecret = requireJwtSecret();
 
   const options: SignOptions = {
     expiresIn: (process.env.JWT_EXPIRES_IN || '1h') as SignOptions['expiresIn'],
