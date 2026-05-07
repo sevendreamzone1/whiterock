@@ -25,6 +25,12 @@ interface RegisterUserPayload {
   password: string;
 }
 
+interface UpdateUserPayload {
+  firstName: string;
+  email: string;
+  password?: string;
+}
+
 interface LoginPayload {
   email: string;
   password: string;
@@ -85,6 +91,28 @@ function validateRegistrationPayload(body: unknown = {}): RegisterUserPayload {
   }
 
   return { firstName, email, password };
+}
+
+function validateUpdatePayload(body: unknown = {}): UpdateUserPayload {
+  const firstName =
+    getPayloadValue(body, 'firstName')?.trim() ||
+    getPayloadValue(body, 'first_name')?.trim();
+  const email = getPayloadValue(body, 'email')?.trim();
+  const password = getPayloadValue(body, 'password')?.trim();
+
+  if (!firstName || !email) {
+    throw createError('First name and email are required', 400);
+  }
+
+  if (!email.includes('@')) {
+    throw createError('Email must be valid', 400);
+  }
+
+  if (password && password.length < 6) {
+    throw createError('Password must be at least 6 characters', 400);
+  }
+
+  return { firstName, email, password: password || undefined };
 }
 
 function validateLoginPayload(body: unknown = {}): LoginPayload {
@@ -158,6 +186,36 @@ async function createUser(body: unknown): Promise<PublicUser> {
   return user;
 }
 
+async function updateUser(idParam: unknown, body: unknown): Promise<PublicUser> {
+  const id = parseUserId(idParam);
+  const existingUser = await userModel.findById(id);
+
+  if (!existingUser) {
+    throw createError('User not found', 404);
+  }
+
+  const { firstName, email, password } = validateUpdatePayload(body);
+  const passwordHash = password ? await bcrypt.hash(password, 10) : undefined;
+
+  try {
+    await userModel.update(id, { firstName, email, passwordHash });
+  } catch (err) {
+    if (isDuplicateEmailError(err)) {
+      throw createError('Email is already registered', 409);
+    }
+
+    throw err;
+  }
+
+  const updatedUser = await userModel.findById(id);
+
+  if (!updatedUser) {
+    throw createError('Updated user not found', 500);
+  }
+
+  return updatedUser;
+}
+
 async function registerUser(body: unknown): Promise<PublicUser> {
   return createUser(body);
 }
@@ -219,4 +277,5 @@ export {
   listUsers,
   loginUser,
   registerUser,
+  updateUser,
 };

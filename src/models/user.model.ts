@@ -32,7 +32,13 @@ interface CreateUserParams {
   passwordHash: string;
 }
 
-interface DeleteResult {
+interface UpdateUserParams {
+  firstName: string;
+  email: string;
+  passwordHash?: string;
+}
+
+interface MutationResult {
   affectedRows: number;
 }
 
@@ -106,7 +112,38 @@ async function create({
   return result.insertId;
 }
 
-async function remove(id: number): Promise<DeleteResult> {
+async function update(
+  id: number,
+  { firstName, email, passwordHash }: UpdateUserParams,
+): Promise<MutationResult> {
+  if (databaseClient === 'postgres') {
+    if (passwordHash) {
+      return executePostgres(
+        'UPDATE users SET first_name = $1, email = $2, password_hash = $3 WHERE id = $4',
+        [firstName, email, passwordHash, id],
+      );
+    }
+
+    return executePostgres(
+      'UPDATE users SET first_name = $1, email = $2 WHERE id = $3',
+      [firstName, email, id],
+    );
+  }
+
+  const result = passwordHash
+    ? await queryMySql<ResultSetHeader>(
+        'UPDATE users SET first_name = ?, email = ?, password_hash = ? WHERE id = ?',
+        [firstName, email, passwordHash, id],
+      )
+    : await queryMySql<ResultSetHeader>(
+        'UPDATE users SET first_name = ?, email = ? WHERE id = ?',
+        [firstName, email, id],
+      );
+
+  return { affectedRows: result.affectedRows };
+}
+
+async function remove(id: number): Promise<MutationResult> {
   if (databaseClient === 'postgres') {
     return executePostgres('DELETE FROM users WHERE id = $1', [id]);
   }
@@ -119,4 +156,4 @@ async function remove(id: number): Promise<DeleteResult> {
   return { affectedRows: result.affectedRows };
 }
 
-export { create, findAll, findByEmailForAuth, findById, remove };
+export { create, findAll, findByEmailForAuth, findById, remove, update };

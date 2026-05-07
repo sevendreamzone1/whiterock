@@ -15,7 +15,7 @@ src/
   app.ts           Express app setup
   server.ts        Entry point
 client/
-  src/             React TypeScript login/register UI
+  src/             React TypeScript login/register and user CRUD UI
   vite.config.ts   Frontend dev server and build config
 ```
 
@@ -40,6 +40,8 @@ copy .env.example .env
 ```bash
 npm run db:schema
 ```
+
+This command is non-destructive and uses `CREATE TABLE IF NOT EXISTS`.
 
 5. Check the database connection:
 
@@ -115,6 +117,7 @@ npm run db:schema:postgres
 - `GET /api/users` - list users, requires Bearer token
 - `GET /api/users/:id` - get one user, requires Bearer token
 - `POST /api/users` - create a user, requires Bearer token
+- `PUT /api/users/:id` - update a user, requires Bearer token
 - `DELETE /api/users/:id` - delete a user, requires Bearer token
 
 Passwords are accepted as `password` and stored as a bcrypt hash in `password_hash`.

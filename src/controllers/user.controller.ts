@@ -41,6 +41,19 @@ async function createUser(
   }
 }
 
+async function updateUser(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const user = await userService.updateUser(req.params.id, req.body);
+    res.json(user);
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function deleteUser(
   req: Request,
   res: Response,
@@ -80,4 +93,12 @@ async function registerUser(
   }
 }
 
-export { createUser, deleteUser, getUser, listUsers, loginUser, registerUser };
+export {
+  createUser,
+  deleteUser,
+  getUser,
+  listUsers,
+  loginUser,
+  registerUser,
+  updateUser,
+};
