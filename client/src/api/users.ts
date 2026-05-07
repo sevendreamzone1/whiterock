@@ -1,4 +1,4 @@
-import { apiRequest } from './http';
+import { apiRequest, apiUrl } from './http';
 import type { PublicUser, UserPayload } from './types';
 
 export function listUsers(token: string): Promise<PublicUser[]> {
@@ -32,5 +32,18 @@ export function deleteUser(token: string, userId: number): Promise<null> {
   return apiRequest<null>(`/api/users/${userId}`, {
     method: 'DELETE',
     token,
+  });
+}
+
+export function openUserEventsStream(
+  token: string,
+  signal: AbortSignal,
+): Promise<Response> {
+  return fetch(apiUrl('/api/users/events'), {
+    headers: {
+      Accept: 'text/event-stream',
+      Authorization: `Bearer ${token}`,
+    },
+    signal,
   });
 }

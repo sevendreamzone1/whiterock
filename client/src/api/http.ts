@@ -47,7 +47,7 @@ function removeInterceptor<T>(interceptors: T[], interceptor: T): void {
   }
 }
 
-function apiUrl(path: string): string {
+export function apiUrl(path: string): string {
   if (/^https?:\/\//i.test(path)) {
     return path;
   }

@@ -115,6 +115,7 @@ npm run db:schema:postgres
 - `POST /api/register` - register a user with JSON body `{ "firstName": "Asha", "email": "asha@example.com", "password": "secret123" }`
 - `POST /api/login` - login with JSON body `{ "email": "asha@example.com", "password": "secret123" }`
 - `GET /api/users` - list users, requires Bearer token
+- `GET /api/users/events` - stream user-list changes, requires Bearer token
 - `GET /api/users/:id` - get one user, requires Bearer token
 - `POST /api/users` - create a user, requires Bearer token
 - `PUT /api/users/:id` - update a user, requires Bearer token
