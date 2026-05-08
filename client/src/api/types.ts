@@ -16,6 +16,14 @@ export interface PublicUser {
   created_at: string;
 }
 
+export interface Product {
+  id: number;
+  name: string;
+  category: string;
+  price: number;
+  created_at: string;
+}
+
 export interface HealthResponse {
   status: 'ok' | 'error';
   database: {
@@ -38,6 +46,12 @@ export interface UserPayload {
   firstName: string;
   email: string;
   password?: string;
+}
+
+export interface ProductPayload {
+  category: string;
+  name: string;
+  price: number;
 }
 
 export interface ApiErrorResponse {

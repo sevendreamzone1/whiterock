@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from './lib/auth';
 import { AuthPage } from './pages/AuthPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { ProductsPage } from './pages/ProductsPage';
+import { ShopPage } from './pages/ShopPage';
 import { queryClient } from './query/queryClient';
 
 function IndexRedirect() {
@@ -22,11 +24,20 @@ function AppRoutes() {
         <Route index element={<IndexRedirect />} />
         <Route path="login" element={<AuthPage mode="login" />} />
         <Route path="register" element={<AuthPage mode="register" />} />
+        <Route path="shop" element={<ShopPage />} />
         <Route
           path="dashboard"
           element={
             <ProtectedRoute>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="products"
+          element={
+            <ProtectedRoute>
+              <ProductsPage />
             </ProtectedRoute>
           }
         />

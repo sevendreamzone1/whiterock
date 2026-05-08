@@ -7,8 +7,8 @@ import userRoutes from './routes/user.routes';
 
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: '2mb' }));
+app.use(express.urlencoded({ extended: false, limit: '2mb' }));
 
 app.get('/', (_req: Request, res: Response) => {
   res.json({ message: 'Registration API is running' });
@@ -50,6 +50,7 @@ app.get('/api/health/tables', async (_req: Request, res: Response) => {
       auth: getAuthConfigStatus(),
       tables,
       checks: {
+        productsTablePresent: tables.includes('products'),
         usersTablePresent: tables.includes('users'),
       },
     });
@@ -63,6 +64,7 @@ app.get('/api/health/tables', async (_req: Request, res: Response) => {
       auth: getAuthConfigStatus(),
       tables: [],
       checks: {
+        productsTablePresent: false,
         usersTablePresent: false,
       },
     });

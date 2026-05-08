@@ -105,6 +105,7 @@ You can verify deployment configuration with:
 
 - `GET /api/health` - checks database connectivity and whether JWT auth is configured
 - `GET /api/health/tables` - checks the database tables and confirms the `users` table exists
+- `GET /api/health/tables` also confirms the `products` table exists for the catalog page
 
 ## TypeScript
 
@@ -127,6 +128,15 @@ You can verify deployment configuration with:
 - `POST /api/users` - create a user, requires Bearer token
 - `PUT /api/users/:id` - update a user, requires Bearer token
 - `DELETE /api/users/:id` - delete a user, requires Bearer token
+- `GET /api/products` - list products for the public shop
+- `POST /api/products` - create a product with JSON body `{ "name": "Headphones", "category": "Electronics", "price": 49.99 }`, requires Bearer token
+- `PUT /api/products/:id` - update a product, requires Bearer token
+- `DELETE /api/products/:id` - delete a product, requires Bearer token
+
+The React app includes:
+
+- `/products` - logged-in product inventory management with add, edit, and delete
+- `/shop` - public shopping page with search, category filter, cart, and buy flow
 
 Passwords are accepted as `password` and stored as a bcrypt hash in `password_hash`.
 

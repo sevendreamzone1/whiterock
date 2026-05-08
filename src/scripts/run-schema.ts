@@ -15,6 +15,38 @@ function getErrorMessage(err: unknown): string {
   return err instanceof Error ? err.message : String(err);
 }
 
+async function columnExists(
+  connection: mysql.Connection,
+  tableName: string,
+  columnName: string,
+): Promise<boolean> {
+  const [rows] = await connection.query<mysql.RowDataPacket[]>(
+    `
+      SELECT COLUMN_NAME
+      FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = ?
+        AND COLUMN_NAME = ?
+      LIMIT 1
+    `,
+    [tableName, columnName],
+  );
+
+  return rows.length > 0;
+}
+
+async function ensureProductSchema(connection: mysql.Connection): Promise<void> {
+  if (!(await columnExists(connection, 'products', 'category'))) {
+    await connection.query(
+      "ALTER TABLE products ADD COLUMN category VARCHAR(100) NOT NULL DEFAULT 'General' AFTER name",
+    );
+  }
+
+  if (await columnExists(connection, 'products', 'image_url')) {
+    await connection.query('ALTER TABLE products DROP COLUMN image_url');
+  }
+}
+
 async function main(): Promise<void> {
   const schemaPath = path.join(__dirname, '..', '..', 'schema.sql');
   const schema = await fs.readFile(schemaPath, 'utf8');
@@ -30,6 +62,7 @@ async function main(): Promise<void> {
     await connection.query(`CREATE DATABASE IF NOT EXISTS \`${dbName}\``);
     await connection.query(`USE \`${dbName}\``);
     await connection.query(schema);
+    await ensureProductSchema(connection);
     console.log(`Schema executed from ${schemaPath} into ${dbName}`);
   } finally {
     await connection.end();

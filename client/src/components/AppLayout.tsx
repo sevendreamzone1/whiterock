@@ -1,4 +1,10 @@
-import { LogOut, ShieldCheck } from 'lucide-react';
+import {
+  LayoutDashboard,
+  LogOut,
+  ShieldCheck,
+  ShoppingBag,
+  Store,
+} from 'lucide-react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -13,6 +19,15 @@ function navClass({ isActive }: { isActive: boolean }): string {
   ].join(' ');
 }
 
+function sidebarNavClass({ isActive }: { isActive: boolean }): string {
+  return [
+    'inline-flex min-h-11 items-center gap-3 rounded-md px-3 text-sm font-black transition',
+    isActive
+      ? 'bg-slate-900 text-white shadow-sm'
+      : 'text-slate-600 hover:bg-white hover:text-slate-950',
+  ].join(' ');
+}
+
 export function AppLayout() {
   const { clearSession, session } = useAuth();
   const navigate = useNavigate();
@@ -21,7 +36,7 @@ export function AppLayout() {
 
   function handleLogout(): void {
     clearSession();
-    queryClient.removeQueries({ queryKey: ['users'] });
+    queryClient.removeQueries();
     navigate('/login', { replace: true });
   }
 
@@ -46,13 +61,27 @@ export function AppLayout() {
             </span>
           </NavLink>
 
-          <nav className="flex flex-wrap items-center gap-2" aria-label="Main">
+          <nav
+            className={`flex flex-wrap items-center gap-2 ${session ? 'md:hidden' : ''}`}
+            aria-label="Main"
+          >
             {session ? (
-              <NavLink className={navClass} to="/dashboard">
-                Dashboard
-              </NavLink>
+              <>
+                <NavLink className={navClass} to="/dashboard">
+                  Dashboard
+                </NavLink>
+                <NavLink className={navClass} to="/products">
+                  Products
+                </NavLink>
+                <NavLink className={navClass} to="/shop">
+                  Shop
+                </NavLink>
+              </>
             ) : (
               <>
+                <NavLink className={navClass} to="/shop">
+                  Shop
+                </NavLink>
                 <NavLink className={navClass} to="/login">
                   Login
                 </NavLink>
@@ -95,9 +124,34 @@ export function AppLayout() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <Outlet />
-      </main>
+      {session ? (
+        <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-6 sm:px-6 md:grid-cols-[220px_minmax(0,1fr)] lg:px-8">
+          <aside className="hidden md:block" aria-label="Sidebar">
+            <div className="sticky top-6 grid gap-2">
+              <NavLink className={sidebarNavClass} to="/dashboard">
+                <LayoutDashboard aria-hidden="true" className="size-4" />
+                Users
+              </NavLink>
+              <NavLink className={sidebarNavClass} to="/products">
+                <ShoppingBag aria-hidden="true" className="size-4" />
+                Products
+              </NavLink>
+              <NavLink className={sidebarNavClass} to="/shop">
+                <Store aria-hidden="true" className="size-4" />
+                Shop
+              </NavLink>
+            </div>
+          </aside>
+
+          <main className="min-w-0">
+            <Outlet />
+          </main>
+        </div>
+      ) : (
+        <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <Outlet />
+        </main>
+      )}
 
       <footer className="border-t border-slate-200 px-4 py-5 text-center text-sm font-medium text-slate-500 sm:px-6">
         <span>Registration API dashboard</span>
